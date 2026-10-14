@@ -178,3 +178,26 @@ figcaption i { color: var(--green); margin-right: .5rem; }
 [data-theme="blue"] .chips li:hover { background: #e4f8ec; border-color: var(--mint); }
 [data-theme="blue"] .photo-round, [data-theme="blue"] .interest-grid .photo { box-shadow: 0 0 0 6px var(--bg), 0 0 0 10px var(--mint); }
 [data-theme="blue"] .site-footer { background: var(--green-dark); color: #fff; }
+
+/* ========== CENTERED LAYOUT (overrides) ========== */
+/* Section headings + intro text */
+main > section > h2, .lead { text-align: center; }
+.lead { margin-left: auto; margin-right: auto; }
+[data-theme="blue"] h2::after { margin-left: auto; margin-right: auto; }
+
+/* Tech stack: centre each group and its chips */
+.stack-grid > div { text-align: center; }
+.chips { justify-content: center; }
+
+/* Chat box sits in the middle of the page */
+.chat { margin: 0 auto; }
+
+/* Phones / small screens: centre the header and the hero */
+@media (max-width: 760px) {
+  .site-header { align-items: center; text-align: center; }
+  .site-header nav { flex-wrap: wrap; justify-content: center; overflow-x: visible; max-width: 100%; }
+  .hero { text-align: center; justify-items: center; }
+  .hero p { margin-left: auto; margin-right: auto; }
+  .hero .photo-round { justify-self: center; }
+  .actions { justify-content: center; }
+}
