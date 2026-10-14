@@ -113,7 +113,8 @@ async function ask(question) {
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: chatHistory })
+      body: JSON.stringify({ messages: chatHistory }),
+      signal: AbortSignal.timeout(25000) // give up after 25 seconds
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
@@ -122,7 +123,9 @@ async function ask(question) {
   } catch (err) {
     console.error("Chat error:", err); // press F12 > Console to see why it failed
     chatHistory.pop(); // drop the unanswered question
-    pending.textContent = "Sorry, the assistant is unavailable right now. Please use the contact form below.";
+    pending.textContent = err.name === "TimeoutError"
+      ? "Sorry, that took too long. Please try again or use the contact form below."
+      : "Sorry, the assistant is unavailable right now. Please use the contact form below.";
   }
 
   pending.classList.remove("pending");
