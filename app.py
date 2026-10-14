@@ -1,28 +1,30 @@
-"""Backend for the "Ask My AI" box. Keeps the API key on the server, never in the browser."""
 import os
-
-from anthropic import Anthropic
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-load_dotenv()  # reads ANTHROPIC_API_KEY from the .env file
+# Use the explicit package path to bypass your PyCharm environment conflict
+import google.generativeai as genai
+
+load_dotenv()
 
 app = Flask(__name__)
 
-# Only your own website may call this API (add your live site URL in .env)
-origins = os.getenv("ALLOWED_ORIGINS", "http://127.0.0.1:5500,http://localhost:5500").split(",")
+# Dynamically updates to match your local browser port (58228) from your screenshot
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:58228,http://127.0.0.1:58228").split(",")
 CORS(app, origins=origins)
 
-# Protects your bill: limits how often one visitor can ask
+# Spambot wallet protection
 limiter = Limiter(get_remote_address, app=app, default_limits=["200 per day"])
 
-client = Anthropic()  # picks up ANTHROPIC_API_KEY automatically
-MODEL = "claude-haiku-4-5-20251001"  # fast and cheap, good for a chat box
+# Configure Gemini using your API key from the .env file
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# ========== EDIT THIS: everything the AI knows about you ==========
+# Using Google's highly efficient, free-tier optimized model
+MODEL = "gemini-1.5-flash"
+
 SYSTEM_PROMPT = """You are the assistant on the portfolio website of Sammy K. (Basetwo).
 Answer visitors' questions about Sammy, using only the facts below.
 
@@ -30,8 +32,7 @@ About Sammy:
 - Web developer with a computer science background, building clean, responsive web experiences.
 - Tech stack: Python, Java, JavaScript, HTML, CSS.
 - Interests: photography, coding, and coffee.
-- Projects: (add your projects here, one line each)
-- Contact: email mbithisama@gmail.com, WhatsApp 0758 991 866, YouTube youtube.com/@sammybase2.
+- Contact: email mbithisama@gmail.com, WhatsApp 0758 991 866, YouTube ://youtube.com.
 
 Rules:
 - Be friendly and keep answers short (2-4 sentences).
@@ -46,23 +47,32 @@ Rules:
 def chat():
     data = request.get_json(silent=True) or {}
 
-    # Keep only the last few valid messages, each capped in length
+    # Format conversation history into the structured layout required by this SDK
     messages = []
     for m in data.get("messages", [])[-8:]:
-        role, content = m.get("role"), str(m.get("content", ""))[:500].strip()
-        if role in ("user", "assistant") and content:
-            messages.append({"role": role, "content": content})
-    while messages and messages[0]["role"] != "user":
-        messages.pop(0)  # a conversation must start with the visitor
+        role = "user" if m.get("role") == "user" else "model"
+        content = str(m.get("content", ""))[:500].strip()
+        if content:
+            messages.append({"role": role, "parts": [content]})
+
     if not messages or messages[-1]["role"] != "user":
         return jsonify(error="Please send a question."), 400
 
     try:
-        response = client.messages.create(
-            model=MODEL, max_tokens=300, system=SYSTEM_PROMPT, messages=messages
+        # Initialize the model container injecting the system instructions
+        model = genai.GenerativeModel(
+            model_name=MODEL,
+            system_instruction=SYSTEM_PROMPT
         )
-        return jsonify(reply=response.content[0].text)
-    except Exception:
+
+        # Fire request directly to Google's endpoints
+        response = model.generate_content(messages)
+
+        return jsonify(reply=response.text)
+
+    except Exception as e:
+        # This will output exact diagnostic descriptions to your PyCharm console if a connection breaks
+        print(f"Server-Side Error: {e}")
         return jsonify(error="The assistant is unavailable right now."), 502
 
 
