@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sammy K. (Basetwo) | Web Developer</title>
+  <meta name="description" content="Web Developer | Computer Science | Building clean, responsive web experiences">
+
+  <!-- Fonts and icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css">
+  <link rel="stylesheet" href="style.css">
+  <!-- Applies the saved theme before the page paints (default: blue) -->
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")||"blue"}catch(e){document.documentElement.dataset.theme="blue"}</script>
+</head>
+<body>
+
+  <!-- ========== HEADER / NAV ========== -->
+  <header class="site-header">
+    <a class="brand" href="#top">SammyBasetwo</a>
+    <nav aria-label="Main">
+      <a href="#about">About</a>
+      <a href="#stack">Tech Stack</a>
+      <a href="#projects">Projects</a>
+      <a href="#interests">Interests</a>
+      <a href="#ask">Ask AI</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch colour theme" title="Switch theme"><i class="fa-solid fa-palette"></i></button>
+  </header>
+
+  <main id="top">
+
+    <!-- ========== HERO / PROFILE ========== -->
+    <section class="hero" id="about">
+      <div class="hero-text">
+        <h1>Hi, I'm Sammy K.</h1>
+        <p class="tagline">Web Developer | Computer Science | Building clean, responsive web experiences</p>
+        <p>I build fast, accessible websites and web apps, pairing a computer science foundation with careful attention to design. I care about clean code and interfaces people enjoy using.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#projects"><i class="fa-solid fa-code"></i> See my projects</a>
+          <a class="btn btn-ghost" href="#contact"><i class="fa-regular fa-envelope"></i> Get in touch</a>
+        </div>
+      </div>
+      <!-- Profile picture: put your photo at images/profile.jpg (initials show until then) -->
+      <div class="photo photo-round" aria-label="Profile picture">
+        <span>SK</span>
+        <img src="images/IMG_1962.jpg" alt="Portrait of Sammy K." onerror="this.remove()">
+      </div>
+    </section>
+
+    <!-- ========== TECH STACK (edit the lists to match what you use) ========== -->
+    <section class="section" id="stack">
+      <h2>Tech Stack</h2>
+      <div class="stack-grid">
+        <div>
+          <h3>Languages</h3>
+          <ul class="chips">
+            <li><i class="devicon-python-plain colored"></i>Python</li>
+            <li><i class="devicon-java-plain colored"></i>Java</li>
+            <li><i class="devicon-javascript-plain colored"></i>JavaScript</li>
+            <li><i class="devicon-html5-plain colored"></i>HTML</li>
+            <li><i class="devicon-css3-plain colored"></i>CSS</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Frameworks &amp; Libraries</h3>
+          <ul class="chips">
+            <li><i class="devicon-flask-original"></i>Flask</li>
+            <li><i class="devicon-react-original colored"></i>React</li>
+            <li><i class="devicon-bootstrap-plain colored"></i>Bootstrap</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Databases</h3>
+          <ul class="chips">
+            <li><i class="devicon-mysql-plain colored"></i>MySQL</li>
+            <li><i class="devicon-sqlite-plain colored"></i>SQLite</li>
+            <li><i class="devicon-mongodb-plain colored"></i>MongoDB</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Deployment &amp; Tools</h3>
+          <ul class="chips">
+            <li><i class="devicon-git-plain colored"></i>Git</li>
+            <li><i class="devicon-github-original"></i>GitHub</li>
+            <li><i class="devicon-netlify-plain colored"></i>Netlify</li>
+            <li><i class="devicon-vercel-original"></i>Vercel</li>
+            <li><i class="devicon-vscode-plain colored"></i>VS Code</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PROJECTS (rendered by script.js from the projects list) ========== -->
+    <section class="section" id="projects">
+      <h2>Projects</h2>
+      <div class="project-grid" id="project-grid"></div>
+    </section>
+
+    <!-- ========== INTERESTS: PHOTOGRAPHY, CODE & COFFEE ========== -->
+    <section class="section" id="interests">
+      <h2>Photography, Code and Coffee</h2>
+      <p class="lead">Away from the editor I'm usually behind a camera. Most of my best code gets written with a good cup of coffee next to the keyboard.</p>
+      <div class="interest-grid">
+        <!-- Add images/coding-coffee.jpg and images/camera.jpg -->
+        <figure>
+          <div class="photo"><span>Coding with coffee</span><img src="images/IMG_1926.jpg" alt="coffee"
+                                                                 onerror="this.remove()"></div>
+          <figcaption><i class="fa-solid fa-mug-hot"></i>Coding, one coffee at a time</figcaption>
+        </figure>
+        <figure>
+          <div class="photo"><span>Holding a camera</span><img src="images/SWK_9823.jpg" alt="sammy"
+                                                               onerror="this.remove()"></div>
+          <figcaption><i class="fa-solid fa-camera"></i>Photography is my other way of building things</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ========== ASK MY AI (talks to backend/app.py, see script.js) ========== -->
+    <section class="section" id="ask">
+      <h2>Ask My AI</h2>
+      <p class="lead">Curious about my skills or projects? Ask the assistant. It only knows what I've told it about me.</p>
+      <div class="chat">
+        <div class="chat-log" id="chat-log" aria-live="polite">
+          <p class="msg bot">Hi! Ask me anything about Sammy's work, skills or how to get in touch.</p>
+        </div>
+        <div class="chat-suggest" id="chat-suggest">
+          <button type="button">What's your tech stack?</button>
+          <button type="button">What do you do outside coding?</button>
+          <button type="button">How can I contact Sammy?</button>
+        </div>
+        <form class="chat-form" id="chat-form">
+          <input id="chat-input" placeholder="Ask about Sammy..." maxlength="500" autocomplete="off" required aria-label="Your question">
+          <button class="btn btn-primary" type="submit" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========== CONTACT ========== -->
+    <section class="section" id="contact">
+      <h2>Contact</h2>
+      <div class="contact-wrap">
+
+        <!-- Left: social cards (replace the "#" links with your own pages) -->
+        <ul class="social-list">
+          <li><a class="social-card" style="--brand:#25D366" href="https://wa.me/254758991866" target="_blank" rel="noopener">
+            <i class="fa-brands fa-whatsapp"></i><span><strong>WhatsApp</strong><small>0758 991 866</small></span></a></li>
+          <li><a class="social-card" style="--brand:#EA4335" href="mailto:mbithisama@gmail.com">
+            <i class="fa-solid fa-envelope"></i><span><strong>Email</strong><small>mbithisama@gmail.com</small></span></a></li>
+          <li><a class="social-card" style="--brand:#FF0000" href="https://www.youtube.com/@sammybase2" target="_blank" rel="noopener">
+            <i class="fa-brands fa-youtube"></i><span><strong>YouTube</strong><small>@sammybase2</small></span></a></li>
+          <li><a class="social-card" style="--brand:#0A66C2" href="#" target="_blank" rel="noopener">
+            <i class="fa-brands fa-linkedin-in"></i><span><strong>LinkedIn</strong><small>Sammy (Mbithi) Katumani</small></span></a></li>
+          <li><a class="social-card" style="--brand:#1877F2" href="#" target="_blank" rel="noopener">
+            <i class="fa-brands fa-facebook-f"></i><span><strong>Facebook</strong><small>Sammy Mbithi Katuani (Basetwo)</small></span></a></li>
+          <li><a class="social-card" style="--brand:#000000" href="#" target="_blank" rel="noopener">
+            <i class="fa-brands fa-x-twitter"></i><span><strong>X (Twitter)</strong><small>Sammy Basetwo</small></span></a></li>
+        </ul>
+
+        <!-- Right: contact form (opens the visitor's email app, see script.js) -->
+        <form class="contact-form" id="contact-form">
+          <div class="field-row">
+            <label>First Name *<span class="input"><i class="fa-regular fa-user"></i><input name="first" placeholder="John" required></span></label>
+            <label>Last Name<span class="input"><i class="fa-regular fa-user"></i><input name="last" placeholder="Doe"></span></label>
+          </div>
+          <label>Email *<span class="input"><i class="fa-regular fa-envelope"></i><input type="email" name="email" placeholder="you@example.com" required></span></label>
+          <label>Subject<span class="input"><i class="fa-solid fa-tag"></i><input name="subject" placeholder="Web Development Project"></span></label>
+          <label>Message *<span class="input input-area"><i class="fa-regular fa-comment-dots"></i><textarea name="message" rows="5" placeholder="Tell me about your project..." required></textarea></span></label>
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+          <p class="form-status" id="form-status" role="status"></p>
+        </form>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <p>&copy; 2026 Sammy K. (Basetwo) | Built with passion and code ☕ · Powered by cup of coffee</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
