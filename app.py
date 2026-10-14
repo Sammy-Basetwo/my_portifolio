@@ -1,5 +1,9 @@
 import os
+import re
+import smtplib
+import ssl
 import time
+from email.message import EmailMessage
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -177,6 +181,85 @@ def chat():
     except Exception as e:
         print(f"Server-Side Error: {e}")
         return jsonify(error="The assistant is unavailable right now."), 502
+
+
+# ---------- Contact form: sends the visitor's message to your inbox ----------
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com").strip()
+SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
+SMTP_USER = (os.getenv("SMTP_USER") or "").strip()
+# Gmail shows app passwords in groups with spaces; remove them
+SMTP_PASSWORD = (os.getenv("SMTP_PASSWORD") or "").replace(" ", "").strip()
+CONTACT_TO = (os.getenv("CONTACT_TO") or SMTP_USER).strip()
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+def one_line(text, limit):
+    """Trim and remove line breaks (blocks email header injection)."""
+    return re.sub(r"[\r\n]+", " ", str(text or "")).strip()[:limit]
+
+
+def send_email(msg):
+    """Send via Gmail. Port 465 = SSL; port 587 = STARTTLS. If 465 is blocked, try 587."""
+    ports = [SMTP_PORT] + ([587] if SMTP_PORT == 465 else [])
+    last_error = None
+    for port in ports:
+        try:
+            ctx = ssl.create_default_context()
+            if port == 465:
+                smtp = smtplib.SMTP_SSL(SMTP_HOST, port, context=ctx, timeout=15)
+            else:
+                smtp = smtplib.SMTP(SMTP_HOST, port, timeout=15)
+                smtp.ehlo()
+                smtp.starttls(context=ctx)
+                smtp.ehlo()
+            with smtp:
+                smtp.login(SMTP_USER, SMTP_PASSWORD)
+                smtp.send_message(msg)
+            return
+        except Exception as e:
+            print(f"SMTP port {port} failed: {type(e).__name__}: {e}")
+            last_error = e
+    raise last_error
+
+
+@app.post("/api/contact")
+@limiter.limit("5 per hour")
+def contact():
+    d = request.get_json(silent=True) or {}
+
+    # Hidden "website" field: real people leave it empty, spam bots fill it in
+    if d.get("website"):
+        return jsonify(ok=True)
+
+    first = one_line(d.get("first"), 60)
+    last = one_line(d.get("last"), 60)
+    email = one_line(d.get("email"), 120)
+    subject = one_line(d.get("subject"), 120) or f"Message from {first}"
+    message = str(d.get("message", "")).strip()[:3000]
+
+    if not first or not message:
+        return jsonify(error="Please fill in your name and message."), 400
+    if not EMAIL_RE.match(email):
+        return jsonify(error="Please enter a valid email address."), 400
+
+    if not (SMTP_USER and SMTP_PASSWORD and CONTACT_TO):
+        print("Contact form: SMTP_USER / SMTP_PASSWORD missing in .env")
+        return jsonify(error="Email is not configured."), 503
+
+    msg = EmailMessage()
+    msg["Subject"] = f"[Portfolio] {subject}"
+    msg["From"] = SMTP_USER           # Gmail only allows sending as yourself
+    msg["To"] = CONTACT_TO
+    msg["Reply-To"] = email           # pressing Reply goes to the visitor
+    msg.set_content(f"{message}\n\n--\nFrom: {first} {last}\nEmail: {email}")
+
+    try:
+        send_email(msg)
+        return jsonify(ok=True)
+    except Exception as e:
+        print(f"Contact form error: {type(e).__name__}: {e}")
+        return jsonify(error="Could not send the message right now."), 502
 
 
 if __name__ == "__main__":

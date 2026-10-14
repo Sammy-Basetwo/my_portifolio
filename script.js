@@ -73,18 +73,72 @@ const observer = new IntersectionObserver(entries => {
 
 document.querySelectorAll("main > section[id]").forEach(s => observer.observe(s));
 
-/* ========== CONTACT FORM: opens the visitor's email app with the message filled in ========== */
+/* ========== CONTACT FORM ========== */
+// Free key from https://web3forms.com (enter your email, the key is sent to your inbox).
+// It is safe to keep in this file: it can only send mail to YOUR address.
+const WEB3FORMS_KEY = "09918a4e-6fc8-42eb-a65e-162de3abb499";
+
 const form = document.getElementById("contact-form");
 const formStatus = document.getElementById("form-status");
 
-form.addEventListener("submit", e => {
+// Sends through Web3Forms (works on GitHub Pages, no backend needed)
+async function sendViaWeb3Forms(d) {
+  const res = await fetch("https://api.web3forms.com/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      access_key: WEB3FORMS_KEY,
+      subject: `[Portfolio] ${d.subject || "Message from " + d.first}`,
+      from_name: "Portfolio contact form",
+      name: `${d.first} ${d.last || ""}`.trim(),
+      email: d.email,          // so pressing Reply goes to the visitor
+      message: d.message
+    }),
+    signal: AbortSignal.timeout(20000)
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.success === false) throw new Error(data.message || `Error ${res.status}`);
+}
+
+// Sends through your own Flask backend (/api/contact, Gmail SMTP)
+async function sendViaBackend(d) {
+  const res = await fetch(API_URL.replace(/\/chat$/, "/contact"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(d),
+    signal: AbortSignal.timeout(20000)
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+}
+
+form.addEventListener("submit", async e => {
   e.preventDefault();
+  const btn = form.querySelector('button[type="submit"]');
   const d = Object.fromEntries(new FormData(form));
-  const subject = d.subject || `Message from ${d.first}`;
-  const body = `${d.message}\n\nFrom: ${d.first} ${d.last}\nEmail: ${d.email}`;
-  window.location.href = `mailto:mbithisama@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  formStatus.textContent = "Opening your email app to send the message...";
-  form.reset();
+
+  // Hidden spam-trap field: bots fill it in, people never see it
+  if (d.website) { form.reset(); return; }
+
+  btn.disabled = true;
+  formStatus.textContent = "Sending...";
+
+  try {
+    if (WEB3FORMS_KEY && !WEB3FORMS_KEY.startsWith("PASTE_")) await sendViaWeb3Forms(d);
+    else await sendViaBackend(d);
+    formStatus.textContent = "Thank you! Your message was sent. I'll reply soon.";
+    form.reset();
+  } catch (err) {
+    console.error("Contact form error:", err); // press F12 > Console to see why it failed
+    // Backup so the message isn't lost: open the visitor's email app instead
+    const subject = d.subject || `Message from ${d.first}`;
+    const body = `${d.message}\n\nFrom: ${d.first} ${d.last}\nEmail: ${d.email}`;
+    formStatus.textContent = `Couldn't send it directly (${err.message}). Opening your email app instead...`;
+    await new Promise(r => setTimeout(r, 4000)); // leave time to read the reason
+    window.location.href = `mailto:mbithisama@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  btn.disabled = false;
 });
 
 /* ========== ASK MY AI ========== */

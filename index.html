@@ -162,8 +162,10 @@
             <i class="fa-brands fa-x-twitter"></i><span><strong>X (Twitter)</strong><small>Sammy Basetwo</small></span></a></li>
         </ul>
 
-        <!-- Right: contact form (opens the visitor's email app, see script.js) -->
+        <!-- Right: contact form (sent through the backend /api/contact, see script.js) -->
         <form class="contact-form" id="contact-form">
+          <!-- Spam trap: hidden from people, bots fill it in -->
+          <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
           <div class="field-row">
             <label>First Name *<span class="input"><i class="fa-regular fa-user"></i><input name="first" placeholder="" required></span></label>
             <label>Last Name<span
