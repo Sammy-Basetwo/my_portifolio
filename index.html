@@ -9,14 +9,17 @@
   <!-- Fonts and icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Caveat:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/devicon.min.css">
   <link rel="stylesheet" href="style.css">
   <!-- Applies the saved theme before the page paints (default: blue) -->
-  <script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")||"blue"}catch(e){document.documentElement.dataset.theme="blue"}</script>
+  <script>document.documentElement.classList.add("js");try{document.documentElement.dataset.theme=localStorage.getItem("theme")||"blue"}catch(e){document.documentElement.dataset.theme="blue"}</script>
 </head>
 <body>
+
+  <!-- Background lines: drawn by script.js, only visible while you scroll -->
+  <canvas id="bg-lines" aria-hidden="true"></canvas>
 
   <!-- ========== HEADER / NAV ========== -->
   <header class="site-header">
@@ -26,7 +29,7 @@
       <a href="#stack">Tech Stack</a>
       <a href="#projects">Projects</a>
       <a href="#interests">Interests</a>
-      <a href="#ask">Ask AI</a>
+      <a href="#ask" id="nav-ask">Ask AI</a>
       <a href="#contact">Contact</a>
     </nav>
     <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch colour theme" title="Switch theme"><i class="fa-solid fa-palette"></i></button>
@@ -49,6 +52,34 @@
       <div class="photo photo-round" aria-label="Profile picture">
         <span>SK</span>
         <img src="images/profile1.JPG" alt="Portrait of Sammy K." onerror="this.remove()">
+      </div>
+    </section>
+
+    <!-- ========== ABOUT ME: photo on the left, your story on the right ========== -->
+    <section class="section about-me" id="story" data-nav="about">
+      <h2>About Me</h2>
+      <div class="about-grid">
+
+        <!-- LEFT: YOUR PHOTO. To change it, put your image in the "images" folder and edit the file name in src="..." -->
+        <figure class="about-photo reveal">
+          <div class="about-frame">
+            <span class="about-placeholder"><i class="fa-regular fa-image"></i>Add your photo</span>
+            <img src="images/IMG_2745.JPG" alt="Sammy working on his laptop" onerror="this.remove()">
+          </div>
+        </figure>
+
+        <!-- RIGHT: YOUR STORY -->
+        <div class="about-card reveal">
+          <span class="about-quote-mark" aria-hidden="true">&ldquo;</span>
+          <p class="about-lead">I&rsquo;m <strong>Sammy Mbithi Katumani</strong>, a web developer and Computer Science student at Kisii University, based in Kisii, Kenya. I build fast, clean websites and web apps for people and businesses who want a strong online presence.</p>
+          <p>I run <strong>Base-Two Creatives</strong>, my freelance studio for web development. Photography, where I started, is now a hobby that sharpened my eye for detail.</p>
+          <p>I work with Python, Java, JavaScript, Flask, React, MySQL and MongoDB, and I&rsquo;m always learning, with a long-term goal of growing a career in tech.</p>
+          <footer class="about-sign">
+            <span class="about-sign-line" aria-hidden="true"></span>
+            <cite>&mdash; Sammy M.</cite>
+          </footer>
+        </div>
+
       </div>
     </section>
 
@@ -121,26 +152,6 @@
       </div>
     </section>
 
-    <!-- ========== ASK MY AI (talks to backend/app.py) ========== -->
-    <section class="section" id="ask">
-      <h2>Ask My AI</h2>
-      <p class="lead">Curious about my skills or projects? Ask the assistant. It only knows what I've told it about me.</p>
-      <div class="chat">
-        <div class="chat-log" id="chat-log" aria-live="polite">
-          <p class="msg bot">Hi! Ask me anything about Sammy's work, skills or how to get in touch.</p>
-        </div>
-        <div class="chat-suggest" id="chat-suggest">
-          <button type="button">What's your tech stack?</button>
-          <button type="button">What do you do outside coding?</button>
-          <button type="button">How can I contact Sammy?</button>
-        </div>
-        <form class="chat-form" id="chat-form">
-          <input id="chat-input" placeholder="Ask about Sammy..." maxlength="500" autocomplete="off" required aria-label="Your question">
-          <button class="btn btn-primary" type="submit" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
-        </form>
-      </div>
-    </section>
-
     <!-- ========== CONTACT ========== -->
     <section class="section" id="contact">
       <h2>Contact</h2>
@@ -187,6 +198,46 @@
   <footer class="site-footer">
     <p>&copy; 2026 Sammy M K. (Basetwo) | Built with passion and code ☕ · Powered by cup of coffee</p>
   </footer>
+
+  <!-- ========== ASK AI: floating widget on the right (talks to backend app.py) ========== -->
+  <div class="ai-widget" id="ai-widget">
+    <button class="ai-launcher" id="ai-launcher" type="button" aria-expanded="false" aria-controls="ai-panel">
+      <span class="ai-launcher-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+      <span class="ai-launcher-text"><strong>Ask AI</strong><small>24/7 support</small></span>
+    </button>
+
+    <section class="ai-panel" id="ai-panel" role="dialog" aria-label="Basetwo's AI support" aria-hidden="true">
+      <header class="ai-head">
+        <div class="ai-head-info">
+          <span class="ai-avatar"><i class="fa-solid fa-wand-magic-sparkles"></i><span class="ai-online"></span></span>
+          <div>
+            <strong>Basetwo's AI support</strong>
+            <small>AI assistant &middot; offers 24/7 support</small>
+          </div>
+        </div>
+        <div class="ai-head-actions">
+          <button class="ai-icon-btn" id="ai-resize" type="button" aria-label="Expand chat" title="Expand chat"><i class="fa-solid fa-expand"></i></button>
+          <button class="ai-icon-btn" id="ai-close" type="button" aria-label="Close chat" title="Close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </header>
+
+      <div class="chat-log" id="chat-log" aria-live="polite">
+        <p class="msg bot">Hi! I'm Basetwo's AI support, here for you 24/7. Ask me anything about Sammy's work, skills or how to get in touch.</p>
+      </div>
+
+      <div class="chat-suggest" id="chat-suggest">
+        <button type="button">What's your tech stack?</button>
+        <button type="button">What is Base-Two Creatives?</button>
+        <button type="button">How can I contact Sammy?</button>
+      </div>
+
+      <form class="chat-form" id="chat-form">
+        <input id="chat-input" placeholder="Ask about Sammy..." maxlength="500" autocomplete="off" required aria-label="Your question">
+        <button class="btn btn-primary" type="submit" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+      <p class="ai-foot">Powered by Gemini &middot; answers come only from what Sammy has shared</p>
+    </section>
+  </div>
 
   <script src="script.js"></script>
 </body>

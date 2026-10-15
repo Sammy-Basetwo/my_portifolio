@@ -10,6 +10,7 @@
   --mint: #7ddb9b;     /* light green used by the blue theme */
   --header-bg: rgba(255,255,255,.94);
   --radius: 24px;
+  --lines-rgb: 37, 99, 235;   /* colour of the scroll lines (blue) */
   --font: "Google Sans", "Albert Sans", Roboto, Arial, sans-serif;
 }
 
@@ -139,21 +140,58 @@ figcaption i { color: var(--green); margin-right: .5rem; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 
-/* ========== ASK MY AI ========== */
-.chat { max-width: 720px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-.chat-log { height: 320px; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
-.msg { margin: 0; max-width: 85%; padding: .65rem 1rem; border-radius: 18px; white-space: pre-wrap; }
+/* ========== ASK AI: floating widget (right side) ========== */
+.ai-launcher { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 30; display: flex; align-items: center; gap: .7rem;
+  padding: .5rem 1.2rem .5rem .5rem; border: 0; border-radius: 999px; font: inherit; color: #fff; cursor: pointer;
+  background: linear-gradient(135deg, var(--green-dark), var(--green)); box-shadow: 0 12px 30px rgba(11,58,140,.35);
+  transition: transform .25s ease, box-shadow .25s ease, opacity .25s ease, visibility .25s; }
+.ai-launcher:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(11,58,140,.42); }
+.ai-launcher-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--mint); color: #0b2a6b;
+  font-size: 1.1rem; animation: ai-pulse 2.6s ease-out infinite; }
+.ai-launcher-text { display: grid; text-align: left; line-height: 1.2; }
+.ai-launcher-text strong { font-size: .95rem; }
+.ai-launcher-text small { font-size: .75rem; opacity: .85; }
+@keyframes ai-pulse { 0% { box-shadow: 0 0 0 0 rgba(125,219,155,.6); } 100% { box-shadow: 0 0 0 14px rgba(125,219,155,0); } }
+.ai-widget.open .ai-launcher { opacity: 0; visibility: hidden; transform: scale(.9); pointer-events: none; }
+
+.ai-panel { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 31; display: flex; flex-direction: column; overflow: hidden;
+  width: min(390px, calc(100vw - 2rem)); height: min(580px, calc(100vh - 2.5rem));
+  background: var(--bg); border: 1px solid var(--line); border-radius: 26px; box-shadow: 0 26px 64px rgba(11,40,100,.32);
+  transform-origin: bottom right; visibility: hidden; opacity: 0; transform: translateY(16px) scale(.96);
+  transition: opacity .25s ease, transform .25s ease, visibility .25s, width .3s ease, height .3s ease; }
+.ai-widget.open .ai-panel { visibility: visible; opacity: 1; transform: none; }
+.ai-panel.large { width: min(760px, calc(100vw - 2rem)); height: min(820px, calc(100vh - 2.5rem)); }
+
+.ai-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem .95rem; color: #fff;
+  background: linear-gradient(135deg, var(--green-dark), var(--green)); }
+.ai-head-info { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.ai-head strong { display: block; font-size: 1rem; line-height: 1.25; }
+.ai-head small { display: block; font-size: .78rem; opacity: .9; }
+.ai-avatar { position: relative; display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 50%;
+  background: var(--mint); color: #0b2a6b; }
+.ai-online { position: absolute; right: -1px; bottom: -1px; width: 12px; height: 12px; border-radius: 50%; background: #22c55e;
+  border: 2px solid var(--green-dark); }
+.ai-head-actions { display: flex; gap: .4rem; flex-shrink: 0; }
+.ai-icon-btn { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(255,255,255,.16); color: #fff; font-size: .95rem; transition: background .2s ease, transform .2s ease; }
+.ai-icon-btn:hover { background: rgba(255,255,255,.32); transform: scale(1.06); }
+.ai-icon-btn:focus-visible { outline-color: #fff; }
+
+.chat-log { flex: 1; min-height: 0; overflow-y: auto; padding: 1.1rem; display: flex; flex-direction: column; gap: .7rem; }
+.msg { margin: 0; max-width: 85%; padding: .65rem 1rem; border-radius: 18px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .msg.bot { background: var(--tint); border-bottom-left-radius: 6px; }
 .msg.user { align-self: flex-end; background: var(--green); color: #fff; border-bottom-right-radius: 6px; }
 .msg.pending { opacity: .6; }
-.chat-suggest { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0 1.25rem 1rem; }
-.chat-suggest button { font: inherit; font-size: .85rem; padding: .3rem .85rem; border: 1px solid var(--line);
+.chat-suggest { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0 1.1rem .9rem; }
+.chat-suggest button { font: inherit; font-size: .82rem; padding: .3rem .85rem; border: 1px solid var(--line);
   border-radius: 999px; background: #fff; color: var(--green-dark); cursor: pointer; }
 .chat-suggest button:hover { background: var(--tint); border-color: var(--green); }
-.chat-form { display: flex; gap: .6rem; padding: .85rem; border-top: 1px solid var(--line); }
+.chat-form { display: flex; gap: .6rem; padding: .8rem; border-top: 1px solid var(--line); }
 .chat-form input { flex: 1; min-width: 0; font: inherit; padding: .7rem 1.1rem; border: 1px solid var(--line); border-radius: 999px; }
 .chat-form input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 20%, transparent); }
-.chat-form .btn { padding: .7rem 1.1rem; }
+.chat-form .btn { padding: .7rem 1.1rem; flex-shrink: 0; min-width: 48px; }
+.chat-suggest[hidden] { display: none; }
+.ai-foot { margin: 0; max-width: none; padding: 0 1rem .7rem; text-align: center; font-size: .72rem; color: var(--muted); }
 
 /* ========== THEME BUTTON (header) ========== */
 .theme-btn { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border: 1px solid var(--line); border-radius: 50%;
@@ -189,9 +227,6 @@ main > section > h2, .lead { text-align: center; }
 .stack-grid > div { text-align: center; }
 .chips { justify-content: center; }
 
-/* Chat box sits in the middle of the page */
-.chat { margin: 0 auto; }
-
 /* Phones / small screens: centre the header and the hero */
 @media (max-width: 760px) {
   .site-header { align-items: center; text-align: center; }
@@ -200,4 +235,62 @@ main > section > h2, .lead { text-align: center; }
   .hero p { margin-left: auto; margin-right: auto; }
   .hero .photo-round { justify-self: center; }
   .actions { justify-content: center; }
+}
+
+/* ========== ABOUT ME ========== */
+.about-grid { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(2rem, 6vw, 4.5rem); align-items: center; }
+
+/* Photo: plain image, full height of the text column, smooth corners */
+.about-photo { position: relative; width: 100%; margin: 0; }
+.about-frame { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 5; overflow: hidden;
+  border-radius: 22px; background: var(--tint); color: var(--green-dark); font-weight: 600; }
+.about-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 28% 25%; }
+.about-placeholder { display: grid; justify-items: center; gap: .5rem; }
+.about-placeholder i { font-size: 2rem; opacity: .6; }
+
+/* Story card with a big quote mark and a handwritten sign-off */
+.about-card { position: relative; padding: 2.4rem 0 .2rem clamp(1.25rem, 3vw, 2.25rem); max-width: 56ch;
+  border-left: 3px solid transparent; border-image: linear-gradient(to bottom, var(--green), var(--mint) 70%, transparent) 1; }
+.about-quote-mark { position: absolute; top: -.35rem; left: clamp(1.25rem, 3vw, 2.25rem); font-family: "Fraunces", Georgia, serif; font-size: 5.5rem;
+  line-height: 1; color: var(--mint); pointer-events: none; }
+.about-card p { max-width: none; margin: 0 0 1.1rem; font-size: 1.05rem; }
+.about-card strong { color: var(--green-dark); font-weight: 500; }
+.about-card .about-lead strong { font-weight: 400; }
+.about-card .about-lead { font-family: "Fraunces", Georgia, "Times New Roman", serif; font-size: clamp(1.2rem, 2.3vw, 1.5rem);
+  line-height: 1.5; font-weight: 400; }
+.about-sign { display: flex; align-items: center; gap: 1rem; margin-top: 1.6rem; }
+.about-sign-line { flex: 0 0 clamp(40px, 12vw, 90px); height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--green), var(--mint)); }
+.about-sign cite { font-family: "Caveat", "Segoe Script", cursive; font-style: normal; font-weight: 600; font-size: 2.2rem; line-height: 1; color: var(--green); }
+
+/* Gentle fade-up when the section scrolls into view */
+.js .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s ease, transform .8s ease; }
+.js .reveal.in { opacity: 1; transform: none; }
+.js .about-card.reveal { transition-delay: .12s; }
+
+@media (max-width: 860px) {
+  .about-grid { grid-template-columns: 1fr; }
+  .about-frame { aspect-ratio: 4 / 4.4; }
+  .about-card { max-width: none; }
+}
+
+/* ========== BACKGROUND LINES (visible only while scrolling) ========== */
+#bg-lines { position: fixed; inset: 0; z-index: -1; width: 100%; height: 100%; pointer-events: none;
+  /* strong near the edges, faded deep inside */
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 0%, rgba(0,0,0,.3) 55%, #000 100%);
+          mask-image: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 0%, rgba(0,0,0,.3) 55%, #000 100%); }
+
+/* ========== ASK AI on small screens ========== */
+@media (max-width: 520px) {
+  .ai-launcher { right: .75rem; bottom: .75rem; }
+  .ai-panel { right: .5rem; left: .5rem; bottom: .5rem; width: auto; height: min(78vh, 600px); }
+  .ai-panel.large { width: auto; height: calc(100vh - 1rem); }
+}
+@media (prefers-reduced-motion: reduce) { .ai-launcher-icon { animation: none; } .js .reveal { opacity: 1; transform: none; } #bg-lines { display: none; } }
+
+[data-theme="green"] { --lines-rgb: 24, 128, 56; }
+
+/* Phones: the two-row header would cover a quarter of the screen, so let it scroll away */
+@media (max-width: 760px) {
+  html { scroll-padding-top: 1rem; }
+  .site-header { position: static; }
 }
